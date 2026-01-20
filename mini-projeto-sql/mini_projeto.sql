@@ -1,89 +1,117 @@
+-- Criação do banco de dados
+CREATE DATABASE Mini_Projeto;
 
---
--- Banco de dados: `mini_projeto`
---
+-- Seleciona o banco para uso
+USE Mini_Projeto;
 
--- --------------------------------------------------------
+/* ======================
+   DDL - Criação das tabelas
+   ====================== */
 
---
--- Estrutura para tabela `tabelafuncionario`
---
+-- Tabela de funcionários
+CREATE TABLE TabelaFuncionario (
+    Id_Funcionario INT AUTO_INCREMENT PRIMARY KEY, -- Identificador único do funcionário
+    Nome_funcionario VARCHAR(100),                  -- Nome do funcionário
+    Departamento VARCHAR(100),                      -- Departamento em que trabalha
+    Salario_funcionario DECIMAL(10,2)               -- Salário com duas casas decimais
+);
 
-CREATE TABLE `tabelafuncionario` (
-  `Id_Funcionario` int(11) NOT NULL,
-  `Nome_funcionario` varchar(100) DEFAULT NULL,
-  `Departamento` varchar(100) DEFAULT NULL,
-  `Salario_funcionario` decimal(10,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- Tabela de projetos
+CREATE TABLE TabelaProjetos (
+    Id_Projeto INT AUTO_INCREMENT PRIMARY KEY,      -- Identificador do projeto
+    Nome_Projeto VARCHAR(100),                       -- Nome do projeto
+    fk_Funcionario INT,                              -- Funcionário responsável (gerente)
+    FOREIGN KEY (fk_Funcionario) 
+        REFERENCES TabelaFuncionario(Id_Funcionario) -- Relacionamento com funcionarios
+);
 
---
--- Despejando dados para a tabela `tabelafuncionario`
---
+/* ======================
+   DML - Inserção de dados
+   ====================== */
 
-INSERT INTO `tabelafuncionario` (`Id_Funcionario`, `Nome_funcionario`, `Departamento`, `Salario_funcionario`) VALUES
-(1, 'Heitor Vieira', 'Financeiro', 4959.22),
-(3, 'Luiza Dias', 'TI', 7500.00),
-(4, 'Davi Lucas Moraes', 'Financeiro', 8437.02),
-(5, 'Pietro Cavalcanti', 'TI', 7500.00),
-(6, 'Evelyn da Mata', 'Vendas', 5278.88),
-(7, 'Isabella Rocha', 'Marketing', 4006.03),
-(8, 'Sra. Manuela Azevedo', 'Vendas', 6101.88),
-(9, 'Brenda Cardoso', 'TI', 7500.00),
-(10, 'Danilo Souza', 'TI', 7500.00);
+-- Inserção dos funcionários
+INSERT INTO TabelaFuncionario (
+    Nome_funcionario,
+    Departamento,
+    Salario_funcionario
+)
+VALUES
+('Heitor Vieira','Financeiro', 4959.22),
+('Daniel Campos','Vendas', 3884.44),
+('Luiza Dias','TI',8205.78),
+('Davi Lucas Moraes','Financeiro',8437.02),
+('Pietro Cavalcanti','TI',4946.88),
+('Evelyn da Mata','Vendas', 5278.88),
+('Isabella Rocha','Marketing',4006.03),
+('Sra. Manuela Azevedo','Vendas',6101.88),
+('Brenda Cardoso','TI',8853.34),
+('Danilo Souza','TI',8242.14);
 
--- --------------------------------------------------------
+/* ======================
+   DQL - Consultas
+   ====================== */
 
---
--- Estrutura para tabela `tabelaprojetos`
---
+-- Seleciona todos os funcionários
+SELECT * 
+FROM TabelaFuncionario;
 
-CREATE TABLE `tabelaprojetos` (
-  `Id_Projeto` int(11) NOT NULL,
-  `Nome_Projeto` varchar(100) DEFAULT NULL,
-  `fk_Funcionario` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- Seleciona os nomes dos funcionários do departamento de Vendas
+SELECT Nome_funcionario 
+FROM TabelaFuncionario 
+WHERE Departamento = 'Vendas';
 
---
--- Índices para tabelas despejadas
---
+-- Seleciona funcionários com salário maior que 5000
+SELECT * 
+FROM TabelaFuncionario 
+WHERE Salario_funcionario > 5000;
 
---
--- Índices de tabela `tabelafuncionario`
---
-ALTER TABLE `tabelafuncionario`
-  ADD PRIMARY KEY (`Id_Funcionario`);
+-- Seleciona os departamentos distintos
+SELECT DISTINCT Departamento 
+FROM TabelaFuncionario;
 
---
--- Índices de tabela `tabelaprojetos`
---
-ALTER TABLE `tabelaprojetos`
-  ADD PRIMARY KEY (`Id_Projeto`),
-  ADD KEY `fk_Funcionario` (`fk_Funcionario`);
+/* ======================
+   DML - Atualização e exclusão
+   ====================== */
 
---
--- AUTO_INCREMENT para tabelas despejadas
---
+-- Atualiza o salário dos funcionários do TI para 7500
+UPDATE TabelaFuncionario 
+SET Salario_funcionario = 7500 
+WHERE Departamento = 'TI';
 
---
--- AUTO_INCREMENT de tabela `tabelafuncionario`
---
-ALTER TABLE `tabelafuncionario`
-  MODIFY `Id_Funcionario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+-- Remove funcionários com salário menor que 4000
+DELETE FROM TabelaFuncionario 
+WHERE Salario_funcionario < 4000;
 
---
--- AUTO_INCREMENT de tabela `tabelaprojetos`
---
-ALTER TABLE `tabelaprojetos`
-  MODIFY `Id_Projeto` int(11) NOT NULL AUTO_INCREMENT;
+-- Seleciona funcionários de Vendas com salário >= 6000
+SELECT Nome_funcionario, Salario_funcionario 
+FROM TabelaFuncionario  
+WHERE Departamento = 'Vendas' 
+AND Salario_funcionario >= 6000;
 
---
--- Restrições para tabelas despejadas
---
+/* ======================
+   Inserção e consulta de projetos
+   ====================== */
 
---
--- Restrições para tabelas `tabelaprojetos`
---
-ALTER TABLE `tabelaprojetos`
-  ADD CONSTRAINT `tabelaprojetos_ibfk_1` FOREIGN KEY (`fk_Funcionario`) REFERENCES `tabelafuncionario` (`Id_Funcionario`);
-COMMIT;
+-- Inserção dos projetos
+INSERT INTO TabelaProjetos (
+    Nome_Projeto,
+    fk_Funcionario
+)
+VALUES
+('Projeto-Minha-Casa', 2),
+('Projeto-Automação_de_IA', 3),
+('Projeto-Agentes_de_IA', 4);
 
+-- Seleciona projetos cujo gerente é o funcionário de ID 2
+SELECT * 
+FROM TabelaProjetos 
+WHERE fk_Funcionario = 2;
+
+/* ======================
+   Remoção da tabela
+   ====================== */
+
+-- Remove a tabela de funcionários (atenção à dependência da FK)
+DROP TABLE TabelaProjetos;
+DROP TABLE 
+TabelaFuncionario;
